@@ -9,14 +9,18 @@
     :root {
       --green: #44b649;
       --dark-green: #10702f;
-      --gray-bg: #eef3f4;
-      --section-bg: #f0f4f7;
+      --gray-bg: #f2f5f7;
+      --section-bg: #fff;
       --border: #e1e8eb;
       --tab-active: #222;
       --tab-inactive: #8b8b8b;
       --accent: #d5e6da;
-      --shadow: 0 2px 6px rgba(44,62,80,0.08);
-      --modal-bg: rgba(0,0,0,0.3);
+      --shadow: 0 4px 24px rgba(44,62,80,0.10);
+      --modal-bg: rgba(0,0,0,0.22);
+      --main-radius: 18px;
+      --main-padding: 22px;
+      --button-radius: 12px;
+      --button-padding: 13px 0;
     }
     html, body {
       margin: 0;
@@ -31,65 +35,89 @@
       position: relative;
       min-height: 100vh;
     }
+
+    /* Header & Logo */
     .header {
       background: linear-gradient(135deg, #44b649 70%, #10702f 100%);
       color: #fff;
-      padding: 28px 0 15px 0;
+      padding: 26px 0 15px 0;
       text-align: center;
       position: relative;
-      border-radius: 0 0 24px 24px;
+      border-radius: 0 0 var(--main-radius) var(--main-radius);
+      box-shadow: 0 2px 16px rgba(44,62,80,0.09);
+      margin-bottom: 11px;
     }
     .header .logo {
       font-weight: bold;
-      font-size: 2.1rem;
+      font-size: 2.05rem;
       letter-spacing: -1px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
     }
-    .header .logo-icon {
-      font-weight: bold;
-      font-size: 2.3rem;
-      font-family: monospace;
+    .header .logo-img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(44,80,62,0.06);
+      border: 1.5px solid var(--green);
+      padding: 2px;
     }
     .header .logout {
       position: absolute;
       top: 15px;
       right: 18px;
-      color: #222;
-      background: none;
+      color: #fff;
+      background: rgba(34,34,34,0.15);
       border: none;
       font-size: 1rem;
       font-weight: 500;
-      text-decoration: underline;
+      border-radius: 7px;
+      padding: 6px 18px;
+      text-decoration: none;
       cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .header .logout:hover {
+      background: #fff;
+      color: var(--green);
+      border: 1.5px solid var(--green);
     }
     .header .welcome {
-      font-size: 1.2rem;
-      margin: 6px 0 3px 0;
+      font-size: 1.15rem;
+      margin: 8px 0 4px 0;
       font-weight: 500;
+      letter-spacing: 0.1px;
     }
     .header .last-login {
-      font-size: 0.95rem;
+      font-size: 0.93rem;
       color: #e1e8eb;
-      opacity: 0.9;
+      opacity: 0.88;
       margin-bottom: -6px;
     }
 
+    /* Tabs */
     .tab-row {
       display: flex;
       justify-content: center;
       align-items: center;
       background: #f3f6f7;
       padding: 0;
-      margin: 0;
-      font-size: 1.25rem;
+      margin: 0 0 6px 0;
+      font-size: 1.17rem;
       border-bottom: 2px solid #dbe2e6;
-      gap: 35px;
+      gap: 28px;
+      border-radius: var(--main-radius);
+      box-shadow: var(--shadow);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
     }
     .tab-row .tab {
-      padding: 18px 10px 10px 10px;
+      padding: 13px 0 10px 0;
       cursor: pointer;
       color: var(--tab-inactive);
       font-weight: 500;
@@ -100,119 +128,141 @@
       background: none;
       border: none;
       outline: none;
+      border-radius: 0;
+      font-size: 1.13rem;
     }
     .tab-row .tab.active {
       color: var(--tab-active);
-      border-bottom: 3px solid #222;
+      border-bottom: 3px solid var(--green);
+      background: #f2f9f3;
     }
 
     .container {
-      padding: 20px 0 0 0;
-      max-width: 430px;
+      padding: 12px 0 0 0;
+      max-width: 460px;
       margin: 0 auto;
     }
+
+    /* Section Cards */
     .section {
-      background: none;
-      margin-bottom: 18px;
+      background: var(--section-bg);
+      border-radius: var(--main-radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 21px;
+      padding: 18px var(--main-padding) 13px var(--main-padding);
     }
     .section-title-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
     .section-title {
-      font-size: 1.3rem;
+      font-size: 1.23rem;
       font-weight: 600;
-      color: #444;
+      color: #255d2c;
+      letter-spacing: 0.1px;
     }
     .section-count {
-      font-size: 1.1rem;
+      font-size: 1.07rem;
       color: #666;
       font-weight: 500;
       margin-left: 7px;
     }
     .section-total {
-      font-size: 1.3rem;
-      font-weight: 600;
-      color: #222;
+      font-size: 1.23rem;
+      font-weight: 700;
+      color: var(--green);
     }
     .section-arrow {
-      font-size: 1.3rem;
-      color: #888;
+      font-size: 1.08rem;
+      color: #8dbf99;
       margin-left: 7px;
       transform: translateY(1px);
     }
+
     .account-list {
       display: flex;
       flex-direction: column;
       gap: 13px;
-      margin-top: 6px;
-      margin-bottom: 10px;
+      margin-top: 8px;
+      margin-bottom: 2px;
     }
     .account-card {
-      background: #fff;
+      background: #f7faf8;
       border-radius: 10px;
-      box-shadow: var(--shadow);
-      padding: 18px 16px 14px 16px;
+      box-shadow: 0 2px 6px rgba(44,62,80,0.06);
+      padding: 14px 15px 12px 15px;
       border-top: 4px solid var(--green);
       display: flex;
       flex-direction: row;
       align-items: flex-start;
       justify-content: space-between;
-      font-size: 1.1rem;
+      font-size: 1.07rem;
+      transition: box-shadow 0.2s;
+    }
+    .account-card:hover {
+      box-shadow: 0 6px 18px rgba(44,62,80,0.10);
     }
     .account-card .account-name {
       font-weight: 600;
-      margin-bottom: 8px;
-      color: #222;
-    }
-    .account-card .account-num {
-      color: #555;
-      font-size: 1.1rem;
+      margin-bottom: 7px;
+      color: #254b29;
+      font-size: 1.04rem;
     }
     .account-card .account-balance {
-      font-weight: 600;
-      font-size: 1.13rem;
-      color: #222;
+      font-weight: 700;
+      font-size: 1.14rem;
+      color: #1b3f21;
       text-align: right;
-      margin-top: 5px;
+      margin-top: 3px;
     }
     .account-card .account-details {
-      font-size: 0.98rem;
+      font-size: 0.96rem;
       color: #888;
       margin-top: 2px;
     }
     .account-card .account-balance-small {
-      font-size: 0.98rem;
+      font-size: 0.96rem;
       color: #666;
       text-align: right;
       margin-top: 0;
     }
 
+    /* Products */
     .explore-products {
-      margin-bottom: 18px;
+      margin-bottom: 21px;
+      background: var(--section-bg);
+      border-radius: var(--main-radius);
+      box-shadow: var(--shadow);
+      padding: 15px var(--main-padding) 10px var(--main-padding);
     }
     .explore-title {
-      font-size: 1.17rem;
+      font-size: 1.09rem;
       font-weight: 600;
       margin-bottom: 9px;
-      color: #444;
+      color: #2a522e;
+      letter-spacing: 0.05em;
     }
     .product-card {
-      background: #fff;
+      background: #fafbfa;
       border: 2px dashed #bfc5c9;
       border-radius: 13px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 17px 18px;
-      font-size: 1.1rem;
+      padding: 15px 14px;
+      font-size: 1.08rem;
       margin-bottom: 5px;
       box-shadow: none;
+      transition: border 0.2s;
+      cursor: pointer;
+    }
+    .product-card:hover {
+      border: 2px solid var(--green);
     }
     .product-card .product-icon {
-      font-size: 1.5rem;
+      font-size: 1.35rem;
       margin-right: 7px;
       color: #222;
     }
@@ -225,28 +275,34 @@
     .product-card .product-offer {
       background: var(--green);
       color: #fff;
-      border-radius: 7px;
-      font-size: 0.95rem;
-      padding: 3px 13px 3px 13px;
+      border-radius: 6px;
+      font-size: 0.92rem;
+      padding: 3px 10px 3px 10px;
       font-weight: 600;
       margin-left: 13px;
       white-space: nowrap;
     }
 
+    /* Modern Tools Section */
     .tools-section {
-      margin-top: 21px;
-      margin-bottom: 20px;
+      margin-top: 23px;
+      margin-bottom: 15px;
+      background: var(--section-bg);
+      border-radius: var(--main-radius);
+      box-shadow: var(--shadow);
+      padding: 15px var(--main-padding) 16px var(--main-padding);
     }
     .tools-title-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 13px;
     }
     .tools-title {
-      font-size: 1.17rem;
-      font-weight: 600;
-      color: #444;
+      font-size: 1.13rem;
+      font-weight: 700;
+      color: #23792a;
+      letter-spacing: 0.04em;
     }
     .manage-dashboard {
       font-size: 1rem;
@@ -258,50 +314,51 @@
       align-items: center;
       gap: 4px;
     }
+
     .tools-list {
       display: flex;
-      align-items: center;
-      gap: 7px; /* reduce gap for more compact layout */
-      margin-bottom: 8px;
-      margin-top: 0;
-      padding: 0;
-      flex-wrap: wrap;
-      justify-content: flex-start;
+      flex-direction: column;
+      gap: 11px;
+      width: 100%;
+    }
+    .tools-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      width: 100%;
     }
     .tool-item {
-      background: #fff;
-      border-radius: 8px;
-      padding: 6px 7px 4px 7px;
-      box-shadow: var(--shadow);
+      flex: 1 1 0;
+      background: #f7faf8;
+      border-radius: var(--button-radius);
+      padding: 14px 0 11px 0;
+      box-shadow: 0 2px 8px rgba(44,62,80,0.07);
       display: flex;
       flex-direction: column;
       align-items: center;
-      font-size: 0.92rem;
-      font-weight: 500;
-      color: #444;
-      min-width: 52px;
-      text-align: center;
+      font-size: 1.01rem;
+      font-weight: 600;
+      color: #388c47;
       border: 2px solid transparent;
-      transition: border 0.2s;
+      transition: border 0.2s, box-shadow 0.2s, background 0.2s;
       cursor: pointer;
-      max-width: 56px;
-      flex: 1 1 52px;
+      outline: none;
+      letter-spacing: 0.01em;
+      user-select: none;
     }
-    .tool-item.selected {
+    .tool-item.selected,
+    .tool-item:focus,
+    .tool-item:hover {
       border: 2px solid var(--green);
+      background: #f2f9f3;
       color: var(--green);
+      box-shadow: 0 4px 18px rgba(44,62,80,0.13);
     }
     .tool-item .tool-icon {
-      margin-bottom: 5px;
-      font-size: 1.23rem;
-    }
-    .tool-sep {
-      width: 2px;
-      height: 30px;
-      background: #e1e8eb;
-      margin: 0 5px;
-      border-radius: 1px;
-      flex: none;
+      margin-bottom: 7px;
+      font-size: 1.5rem;
+      color: inherit;
+      display: block;
     }
 
     /* Bottom Nav */
@@ -344,25 +401,23 @@
       .container {
         max-width: 100vw;
       }
-      .tools-list {
-        flex-wrap: wrap;
-        gap: 5px;
+      .section, .explore-products, .tools-section {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+      .tools-row {
+        gap: 8px;
       }
       .tool-item {
-        min-width: 45px;
-        max-width: 48px;
-        font-size: 0.88rem;
-        padding: 4px 4px 3px 4px;
+        font-size: 0.93rem;
+        padding: 11px 0 8px 0;
       }
       .tool-item .tool-icon {
-        font-size: 1rem;
-      }
-      .tool-sep {
-        height: 26px;
+        font-size: 1.2rem;
       }
     }
 
-    /* Modal styles */
+    /* Modal styles ... unchanged ... */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -435,7 +490,7 @@
       100% { transform: rotate(360deg);}
     }
 
-    /* Transfers Section */
+    /* Transfers Section ... unchanged ... */
     .transfer-section {
       display: none;
       flex-direction: column;
@@ -540,7 +595,7 @@
       color: #fff;
       cursor: pointer;
     }
-    /* Activities log */
+    /* Activities log ... unchanged ... */
     .activity-log-section {
       background: #fff;
       border-radius: 10px;
@@ -571,7 +626,7 @@
   <div class="header">
     <button class="logout" id="logoutBtn">Log Out</button>
     <div class="logo">
-      <span class="logo-icon">🟩</span>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/Huntington_Bank_logo.png" alt="Huntington Logo" class="logo-img">
       Huntington
     </div>
     <div class="welcome">Welcome, Sheree Kiti</div>
@@ -641,42 +696,40 @@
       </div>
     </div>
 
-    <!-- ... (everything before remains unchanged) ... -->
-    <!-- Tools -->
+    <!-- Tools Section Modernized -->
     <div class="tools-section">
       <div class="tools-title-row">
         <div class="tools-title">Tools</div>
         <div class="manage-dashboard" id="manageDashboardBtn">&#9881; Manage Dashboard</div>
       </div>
-      <div class="tools-list" style="flex-direction: column; gap: 5px;">
-        <div style="display: flex; gap: 7px; width: 100%;">
-          <div class="tool-item selected" id="spendingBtn">
+      <div class="tools-list">
+        <div class="tools-row">
+          <div class="tool-item selected" id="spendingBtn" tabindex="0">
             <div class="tool-icon">🟢</div>
             Spending
           </div>
-          <div class="tool-item" id="budgetingBtn">
+          <div class="tool-item" id="budgetingBtn" tabindex="0">
             <div class="tool-icon">≡</div>
             Budgeting
           </div>
         </div>
-        <div style="display: flex; gap: 7px; width: 100%; margin-top: 3px;">
-          <div class="tool-item" id="goalsBtn">
+        <div class="tools-row">
+          <div class="tool-item" id="goalsBtn" tabindex="0">
             <div class="tool-icon">🏆</div>
             Goals
           </div>
-          <div class="tool-item" id="planningBtn">
+          <div class="tool-item" id="planningBtn" tabindex="0">
             <div class="tool-icon">🗓️</div>
             Planning
           </div>
         </div>
       </div>
     </div>
-<!-- ... (everything after remains unchanged) ... -->
     <!-- Padding for bottom navigation -->
     <div style="height: 70px;"></div>
   </div>
 
-  <!-- Transfers Section (hidden by default) -->
+  <!-- Transfers Section (hidden by default) ... unchanged ... -->
   <div class="transfer-section" id="transferSection">
     <div class="transfer-header">
       Transfers
@@ -693,7 +746,7 @@
     </div>
   </div>
 
-  <!-- Bottom Nav -->
+  <!-- Bottom Nav ... unchanged ... -->
   <div class="bottom-nav">
     <a href="#" class="nav-item active" id="hubBtn">
       <span class="nav-icon">⬢</span>
@@ -717,7 +770,7 @@
     </a>
   </div>
 
-  <!-- Modal/Popup -->
+  <!-- Modal/Popup ... unchanged ... -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-box" id="modalBox">
       <!-- Content injected by JS -->
