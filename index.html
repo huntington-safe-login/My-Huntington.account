@@ -66,26 +66,63 @@
       border: 1.5px solid var(--green);
       padding: 2px;
     }
-    .header .logout {
-      position: absolute;
-      top: 15px;
-      right: 18px;
+    /* Logout floating button */
+    .floating-logout-btn {
+      position: fixed;
+      bottom: 84px;
+      right: 26px;
+      background: var(--green);
       color: #fff;
-      background: rgba(34,34,34,0.15);
       border: none;
-      font-size: 1rem;
-      font-weight: 500;
-      border-radius: 7px;
-      padding: 6px 18px;
-      text-decoration: none;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      box-shadow: 0 4px 22px rgba(44, 62, 80, 0.17);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      z-index: 9999;
+      font-size: 2.1rem;
+      transition: background 0.2s, box-shadow 0.2s;
+      outline: none;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
     }
-    .header .logout:hover {
-      background: #fff;
-      color: var(--green);
-      border: 1.5px solid var(--green);
+    .floating-logout-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+      animation: popin 0.3s;
     }
+    @keyframes popin {
+      0% {transform: scale(0.8);}
+      100% {transform: scale(1);}
+    }
+    .floating-logout-btn:active {
+      background: #197e29;
+    }
+    .floating-logout-btn .logout-tooltip {
+      position: absolute;
+      bottom: 62px;
+      right: 50%;
+      transform: translateX(50%);
+      background: #222;
+      color: #fff;
+      font-size: 1rem;
+      padding: 5px 16px;
+      border-radius: 7px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 10000;
+    }
+    .floating-logout-btn:hover .logout-tooltip {
+      opacity: 1;
+    }
+
     .header .welcome {
       font-size: 1.15rem;
       margin: 8px 0 4px 0;
@@ -415,6 +452,12 @@
       .tool-item .tool-icon {
         font-size: 1.2rem;
       }
+      .floating-logout-btn {
+        right: 16px;
+        width: 46px;
+        height: 46px;
+        font-size: 1.5rem;
+      }
     }
 
     /* Modal styles ... unchanged ... */
@@ -624,9 +667,8 @@
 </head>
 <body>
   <div class="header">
-    <button class="logout" id="logoutBtn">Log Out</button>
     <div class="logo">
-      <img src="IMG_0561.png" alt="Huntington Logo" class="logo-img">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/Huntington_Bank_logo.png" alt="Huntington Logo" class="logo-img">
       Huntington
     </div>
     <div class="welcome">Welcome, Sheree Kiti</div>
@@ -728,6 +770,12 @@
     <!-- Padding for bottom navigation -->
     <div style="height: 70px;"></div>
   </div>
+
+  <!-- Floating Logout Button (hidden by default) -->
+  <button id="floatingLogoutBtn" class="floating-logout-btn" title="Logout">
+    <span style="font-size:2.1rem;line-height:1;">&#11044;</span>
+    <span class="logout-tooltip">Logout</span>
+  </button>
 
   <!-- Transfers Section (hidden by default) ... unchanged ... -->
   <div class="transfer-section" id="transferSection">
@@ -884,10 +932,43 @@
       renderActivityLog();
     });
 
-    // Logout button logic (Modified: no interruption, just a toast message)
-    document.getElementById('logoutBtn').addEventListener('click', function(e) {
-      // Show a non-blocking toast message at the top
+    // Floating Logout Button logic
+    const floatingLogoutBtn = document.getElementById('floatingLogoutBtn');
+    let logoutBtnVisible = false;
+    // Show logout when "More" pressed, hide when something else focused/clicked
+    document.getElementById('moreBtn').addEventListener('click', function(e){
+      e.preventDefault();
+      // toggle show/hide
+      logoutBtnVisible = !logoutBtnVisible;
+      floatingLogoutBtn.classList.toggle('visible', logoutBtnVisible);
+    });
+    // Hide logout button when click outside it or on any nav except "More"
+    ['hubBtn','paymentsBtn','transfersBtn','depositsBtn'].forEach(id=>{
+      document.getElementById(id).addEventListener('click', ()=>{
+        logoutBtnVisible = false;
+        floatingLogoutBtn.classList.remove('visible');
+      });
+    });
+    // Hide logout button if user scrolls or resizes
+    window.addEventListener('scroll', ()=>{logoutBtnVisible=false;floatingLogoutBtn.classList.remove('visible');});
+    window.addEventListener('resize', ()=>{logoutBtnVisible=false;floatingLogoutBtn.classList.remove('visible');});
+    // Hide when click outside the floating button
+    document.addEventListener('click', function(e){
+      if (
+        !e.target.closest('#moreBtn') &&
+        !e.target.closest('#floatingLogoutBtn') &&
+        logoutBtnVisible
+      ) {
+        logoutBtnVisible = false;
+        floatingLogoutBtn.classList.remove('visible');
+      }
+    });
+
+    // Floating logout button click (shows toast)
+    floatingLogoutBtn.addEventListener('click', function(e) {
       showToast('Logout is not available at this time.');
+      logoutBtnVisible = false;
+      floatingLogoutBtn.classList.remove('visible');
     });
 
     // Toast notification function
