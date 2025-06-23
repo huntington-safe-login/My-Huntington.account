@@ -884,31 +884,42 @@
       renderActivityLog();
     });
 
-    // Logout button logic
+    // Logout button logic (Modified: no interruption, just a toast message)
     document.getElementById('logoutBtn').addEventListener('click', function(e) {
-      showModal(`
-        <div class="modal-title">Are you sure you want to logout?</div>
-        <div class="modal-actions">
-          <button class="modal-btn" id="modalYes">Yes</button>
-          <button class="modal-btn cancel" id="modalNo">No</button>
-        </div>
-      `);
-      setTimeout(() => {
-        document.getElementById('modalYes').onclick = function() {
-          showModal(`
-            <div class="modal-title">Sorry</div>
-            <div class="modal-msg">You can't Logout because the Action isn't supported right now</div>
-            <div class="modal-actions" style="margin-top:25px">
-              <button class="modal-btn" id="modalOk">OK</button>
-            </div>
-          `);
-          setTimeout(() => {
-            document.getElementById('modalOk').onclick = hideModal;
-          }, 20);
-        }
-        document.getElementById('modalNo').onclick = hideModal;
-      }, 20);
+      // Show a non-blocking toast message at the top
+      showToast('Logout is not available at this time.');
     });
+
+    // Toast notification function
+    function showToast(message) {
+      // Remove existing toast if any
+      let oldToast = document.getElementById('notificationToast');
+      if (oldToast) oldToast.remove();
+
+      let toast = document.createElement('div');
+      toast.id = 'notificationToast';
+      toast.style.position = 'fixed';
+      toast.style.top = '22px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.background = 'rgba(34, 34, 34, 0.97)';
+      toast.style.color = '#fff';
+      toast.style.padding = '12px 28px';
+      toast.style.borderRadius = '30px';
+      toast.style.boxShadow = '0 2px 16px rgba(44,62,80,0.19)';
+      toast.style.fontSize = '1.01rem';
+      toast.style.fontWeight = '500';
+      toast.style.zIndex = '99999';
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '1'; }, 10);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 400);
+      }, 2500);
+    }
 
     // Helper: loading + timeout modal
     function showLoadingTimeoutModal() {
