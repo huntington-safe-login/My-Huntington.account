@@ -132,8 +132,6 @@
       opacity: 0.88;
       margin-bottom: -6px;
     }
-    /* ...other CSS unchanged... */
-    /* Responsive for Logout Button */
     @media (max-width: 500px) {
       .floating-logout-btn {
         right: 16px;
@@ -142,8 +140,7 @@
         font-size: 1.5rem;
       }
     }
-    /* ...rest of your styles... */
-    /* For brevity, all other CSS is unchanged from your previous file */
+    /* ...rest of your styles unchanged... */
   </style>
 </head>
 <body>
@@ -162,7 +159,6 @@
   </div>
 
   <div class="container" id="mainContainer">
-    <!-- ...Sections and content unchanged... -->
     <!-- Cash Section -->
     <div class="section">
       <div class="section-title-row">
@@ -206,7 +202,6 @@
         </div>
       </div>
     </div>
-    <!-- ...other sections unchanged... -->
 
     <!-- Explore Products -->
     <div class="explore-products">
@@ -249,17 +244,16 @@
         </div>
       </div>
     </div>
-    <!-- Padding for bottom navigation -->
     <div style="height: 70px;"></div>
   </div>
 
   <!-- Floating Logout Button (hidden by default) -->
   <button id="floatingLogoutBtn" class="floating-logout-btn" title="Logout">
-    <span style="font-size:2.1rem;line-height:1;">&#11044;</span>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/Huntington_Bank_logo.png" alt="Logout" style="width:32px;height:32px;border-radius:50%;background:#fff;padding:4px;box-shadow:0 1px 6px rgba(44,80,62,0.13);border: 1.5px solid #fff;">
     <span class="logout-tooltip">Logout</span>
   </button>
 
-  <!-- Transfers Section (hidden by default) ... unchanged ... -->
+  <!-- Transfers Section (hidden by default) -->
   <div class="transfer-section" id="transferSection">
     <div class="transfer-header">
       Transfers
@@ -276,7 +270,6 @@
     </div>
   </div>
 
-  <!-- Bottom Nav ... unchanged ... -->
   <div class="bottom-nav">
     <a href="#" class="nav-item active" id="hubBtn">
       <span class="nav-icon">⬢</span>
@@ -300,15 +293,11 @@
     </a>
   </div>
 
-  <!-- Modal/Popup ... unchanged ... -->
   <div class="modal-overlay" id="modalOverlay">
-    <div class="modal-box" id="modalBox">
-      <!-- Content injected by JS -->
-    </div>
+    <div class="modal-box" id="modalBox"></div>
   </div>
   <script>
-    // ... all your previous JS logic unchanged, except for logout button logic ...
-    // Helper: show modal with custom content
+    // Modal helpers
     function showModal(contentHtml) {
       const overlay = document.getElementById('modalOverlay');
       const box = document.getElementById('modalBox');
@@ -318,30 +307,23 @@
     function hideModal() {
       document.getElementById('modalOverlay').classList.remove('active');
     }
-
-    // Loading modal with spinner and message
     function showLoadingModal(message = 'Loading...') {
       showModal(`
         <div class="modal-spinner"></div>
         <div class="modal-loading">${message}</div>
       `);
     }
-
     // Activity Log helpers (using localStorage)
     function getActivities() {
-      try {
-        return JSON.parse(localStorage.getItem('activityLog') || '[]');
-      } catch (e) { return []; }
+      try { return JSON.parse(localStorage.getItem('activityLog') || '[]'); }
+      catch (e) { return []; }
     }
     function setActivities(logs) {
       localStorage.setItem('activityLog', JSON.stringify(logs));
     }
     function addActivity(msg) {
       let logs = getActivities();
-      logs.unshift({
-        msg,
-        time: new Date().toLocaleString()
-      });
+      logs.unshift({ msg, time: new Date().toLocaleString() });
       setActivities(logs);
     }
     function renderActivityLog() {
@@ -354,10 +336,9 @@
         li.textContent = `[${log.time}] ${log.msg}`;
         ul.appendChild(li);
       });
-      // Show/hide section
       document.getElementById('activityLogSection').style.display = logs.length ? 'block' : 'none';
     }
-
+    // Save/retrieve Voice Credit balance (for localStorage, persistent)
     function getVoiceCreditBalance() {
       let v = localStorage.getItem('voiceCreditBalance');
       if(v === null) {
@@ -375,6 +356,7 @@
       document.getElementById('voiceCreditBalance2').innerText = '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2});
       document.getElementById('voiceCreditAvail').innerText = '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2});
     }
+    // Save/retrieve Cash balances (for localStorage, persistent)
     function getCashBalances() {
       let cashObj = localStorage.getItem('cashBalances');
       if(cashObj === null) {
@@ -402,7 +384,6 @@
       let total = balances.checking + balances.savings;
       document.getElementById('cashTotal').innerText = '$' + Number(total).toLocaleString('en-US', {minimumFractionDigits:2});
     }
-
     document.addEventListener('DOMContentLoaded', function() {
       updateVoiceCreditDisplay(getVoiceCreditBalance());
       updateCashDisplay(getCashBalances());
@@ -470,8 +451,6 @@
       }, 2500);
     }
 
-    // All other JS logic for modals, tools, transfers, etc. remains unchanged...
-    // ...[the rest of your JS code from previous posts here]...
     // Helper: loading + timeout modal
     function showLoadingTimeoutModal() {
       showLoadingModal();
