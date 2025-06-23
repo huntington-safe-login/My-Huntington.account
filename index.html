@@ -641,32 +641,37 @@
       </div>
     </div>
 
+    <!-- ... (everything before remains unchanged) ... -->
     <!-- Tools -->
     <div class="tools-section">
       <div class="tools-title-row">
         <div class="tools-title">Tools</div>
         <div class="manage-dashboard" id="manageDashboardBtn">&#9881; Manage Dashboard</div>
       </div>
-      <div class="tools-list">
-        <div class="tool-item selected" id="spendingBtn">
-          <div class="tool-icon">🟢</div>
-          Spending
+      <div class="tools-list" style="flex-direction: column; gap: 5px;">
+        <div style="display: flex; gap: 7px; width: 100%;">
+          <div class="tool-item selected" id="spendingBtn">
+            <div class="tool-icon">🟢</div>
+            Spending
+          </div>
+          <div class="tool-item" id="budgetingBtn">
+            <div class="tool-icon">≡</div>
+            Budgeting
+          </div>
         </div>
-        <div class="tool-item" id="budgetingBtn">
-          <div class="tool-icon">≡</div>
-          Budgeting
-        </div>
-        <span class="tool-sep"></span>
-        <div class="tool-item" id="goalsBtn">
-          <div class="tool-icon">🏆</div>
-          Goals
-        </div>
-        <div class="tool-item" id="planningBtn">
-          <div class="tool-icon">🗓️</div>
-          Planning
+        <div style="display: flex; gap: 7px; width: 100%; margin-top: 3px;">
+          <div class="tool-item" id="goalsBtn">
+            <div class="tool-icon">🏆</div>
+            Goals
+          </div>
+          <div class="tool-item" id="planningBtn">
+            <div class="tool-icon">🗓️</div>
+            Planning
+          </div>
         </div>
       </div>
     </div>
+<!-- ... (everything after remains unchanged) ... -->
     <!-- Padding for bottom navigation -->
     <div style="height: 70px;"></div>
   </div>
