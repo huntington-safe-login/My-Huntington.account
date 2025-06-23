@@ -261,42 +261,47 @@
     .tools-list {
       display: flex;
       align-items: center;
-      gap: 13px;
+      gap: 7px; /* reduce gap for more compact layout */
       margin-bottom: 8px;
       margin-top: 0;
       padding: 0;
+      flex-wrap: wrap;
+      justify-content: flex-start;
     }
     .tool-item {
       background: #fff;
-      border-radius: 12px;
-      padding: 11px 13px 9px 13px;
+      border-radius: 8px;
+      padding: 6px 7px 4px 7px;
       box-shadow: var(--shadow);
       display: flex;
       flex-direction: column;
       align-items: center;
-      font-size: 1rem;
+      font-size: 0.92rem;
       font-weight: 500;
       color: #444;
-      min-width: 70px;
+      min-width: 52px;
       text-align: center;
       border: 2px solid transparent;
       transition: border 0.2s;
       cursor: pointer;
+      max-width: 56px;
+      flex: 1 1 52px;
     }
     .tool-item.selected {
       border: 2px solid var(--green);
       color: var(--green);
     }
     .tool-item .tool-icon {
-      margin-bottom: 9px;
-      font-size: 2rem;
+      margin-bottom: 5px;
+      font-size: 1.23rem;
     }
     .tool-sep {
       width: 2px;
-      height: 36px;
+      height: 30px;
       background: #e1e8eb;
-      margin: 0 7px;
+      margin: 0 5px;
       border-radius: 1px;
+      flex: none;
     }
 
     /* Bottom Nav */
@@ -338,6 +343,22 @@
     @media (max-width: 500px) {
       .container {
         max-width: 100vw;
+      }
+      .tools-list {
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .tool-item {
+        min-width: 45px;
+        max-width: 48px;
+        font-size: 0.88rem;
+        padding: 4px 4px 3px 4px;
+      }
+      .tool-item .tool-icon {
+        font-size: 1rem;
+      }
+      .tool-sep {
+        height: 26px;
       }
     }
 
@@ -568,7 +589,7 @@
     <div class="section">
       <div class="section-title-row">
         <span class="section-title">Cash <span class="section-count">(2)</span></span>
-        <span class="section-total">$11,049.90</span>
+        <span class="section-total" id="cashTotal">$100,482.41</span>
         <span class="section-arrow">&#9650;</span>
       </div>
       <div class="account-list">
@@ -576,13 +597,13 @@
           <div>
             <div class="account-name">Asterisk-Free Checking... 1234</div>
           </div>
-          <div class="account-balance">$834.56</div>
+          <div class="account-balance" id="checkingBalance">$834.56</div>
         </div>
         <div class="account-card">
           <div>
             <div class="account-name">Premier Savings... 5555</div>
           </div>
-          <div class="account-balance">$10,215.34</div>
+          <div class="account-balance" id="savingsBalance">$99,647.85</div>
         </div>
       </div>
     </div>
@@ -591,17 +612,17 @@
     <div class="section" id="creditSection">
       <div class="section-title-row">
         <span class="section-title">Credit <span class="section-count">(1)</span></span>
-        <span class="section-total" id="voiceCreditBalance">$2,347.31</span>
+        <span class="section-total" id="voiceCreditBalance">$100,482.41</span>
         <span class="section-arrow">&#9650;</span>
       </div>
       <div class="account-list">
         <div class="account-card">
           <div>
             <div class="account-name">Voice Credit Card...9968</div>
-            <div class="account-details"><span id="voiceCreditAvail">$1,302.00</span><br>available credit</div>
+            <div class="account-details"><span id="voiceCreditAvail">$100,482.41</span><br>available credit</div>
           </div>
           <div>
-            <div class="account-balance" id="voiceCreditBalance2">$2,347.31</div>
+            <div class="account-balance" id="voiceCreditBalance2">$100,482.41</div>
             <div class="account-balance-small">current balance</div>
           </div>
         </div>
@@ -750,7 +771,13 @@
 
     // Save/retrieve Voice Credit balance (for localStorage, persistent)
     function getVoiceCreditBalance() {
-      return parseFloat(localStorage.getItem('voiceCreditBalance') || "2347.31");
+      // Initialize to 100482.41 if not present
+      let v = localStorage.getItem('voiceCreditBalance');
+      if(v === null) {
+        localStorage.setItem('voiceCreditBalance', "100482.41");
+        return 100482.41;
+      }
+      return parseFloat(v);
     }
     function setVoiceCreditBalance(val) {
       localStorage.setItem('voiceCreditBalance', val.toFixed(2));
@@ -759,11 +786,43 @@
     function updateVoiceCreditDisplay(val) {
       document.getElementById('voiceCreditBalance').innerText = '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2});
       document.getElementById('voiceCreditBalance2').innerText = '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2});
+      document.getElementById('voiceCreditAvail').innerText = '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2});
     }
 
-    // On load, update Voice Credit balance and render activity log if on transfers section
+    // Save/retrieve Cash balances (for localStorage, persistent)
+    function getCashBalances() {
+      // Returns { checking: Number, savings: Number }
+      let cashObj = localStorage.getItem('cashBalances');
+      if(cashObj === null) {
+        let init = { checking: 834.56, savings: 99647.85 };
+        localStorage.setItem('cashBalances', JSON.stringify(init));
+        return init;
+      }
+      try {
+        let parsed = JSON.parse(cashObj);
+        if(typeof parsed.checking !== 'number' || typeof parsed.savings !== 'number') throw "Invalid";
+        return parsed;
+      } catch(e) {
+        let init = { checking: 834.56, savings: 99647.85 };
+        localStorage.setItem('cashBalances', JSON.stringify(init));
+        return init;
+      }
+    }
+    function setCashBalances(obj) {
+      localStorage.setItem('cashBalances', JSON.stringify(obj));
+      updateCashDisplay(obj);
+    }
+    function updateCashDisplay(balances) {
+      document.getElementById('checkingBalance').innerText = '$' + Number(balances.checking).toLocaleString('en-US', {minimumFractionDigits:2});
+      document.getElementById('savingsBalance').innerText = '$' + Number(balances.savings).toLocaleString('en-US', {minimumFractionDigits:2});
+      let total = balances.checking + balances.savings;
+      document.getElementById('cashTotal').innerText = '$' + Number(total).toLocaleString('en-US', {minimumFractionDigits:2});
+    }
+
+    // On load, update all balances and render activity log if on transfers section
     document.addEventListener('DOMContentLoaded', function() {
       updateVoiceCreditDisplay(getVoiceCreditBalance());
+      updateCashDisplay(getCashBalances());
       renderActivityLog();
     });
 
@@ -866,6 +925,13 @@
     function showTransferForm() {
       document.getElementById('transferFormContainer').innerHTML = `
         <form class="transfer-form" id="transferForm">
+          <label for="fromAccount">From Account</label>
+          <select id="fromAccount" required>
+            <option value="">-- Select Account --</option>
+            <option value="credit">Voice Credit Card</option>
+            <option value="checking">Asterisk-Free Checking</option>
+            <option value="savings">Premier Savings</option>
+          </select>
           <label for="bankSelect">Select Bank</label>
           <select id="bankSelect" required>
             <option value="">-- Select Bank --</option>
@@ -882,11 +948,12 @@
       `;
       document.getElementById('transferForm').onsubmit = function(e){
         e.preventDefault();
+        const from = document.getElementById('fromAccount').value;
         const bank = document.getElementById('bankSelect').value;
         const acc = document.getElementById('accountNum').value.trim();
         const routing = document.getElementById('routingNum').value.trim();
         const amount = parseFloat(document.getElementById('amount').value);
-        if(!bank || !acc || !amount || amount <= 0) {
+        if(!from || !bank || !acc || !amount || amount <= 0) {
           showModal(`
             <div class="modal-title">Error</div>
             <div class="modal-msg">Please fill all required fields properly.</div>
@@ -901,6 +968,7 @@
         showModal(`
           <div class="modal-title">Confirm Transfer</div>
           <div class="modal-msg">
+            From: <b>${from === 'credit' ? "Voice Credit Card" : from === 'checking' ? "Asterisk-Free Checking" : "Premier Savings"}</b><br>
             Bank: <b>${bank}</b><br>
             Account: <b>${acc}</b><br>
             ${routing ? 'Routing: <b>'+routing+'</b><br>' : ''}
@@ -915,35 +983,71 @@
           document.getElementById('modalYes').onclick = function() {
             showLoadingModal('Submitting...');
             setTimeout(function(){
-              // Reduce voice credit balance
-              let balance = getVoiceCreditBalance();
-              if(balance < amount) {
+              let success = false;
+              if(from === 'credit') {
+                let balance = getVoiceCreditBalance();
+                if(balance < amount) {
+                  showModal(`
+                    <div class="modal-title">Insufficient Balance</div>
+                    <div class="modal-msg">Your Voice Credit Card balance is not enough for this transfer.</div>
+                    <div class="modal-actions" style="margin-top:25px">
+                      <button class="modal-btn" id="modalOk">OK</button>
+                    </div>
+                  `);
+                  setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
+                  return;
+                }
+                setVoiceCreditBalance(balance - amount);
+                success = true;
+              } else if(from === 'checking' || from === 'savings') {
+                let cash = getCashBalances();
+                if(from === 'checking') {
+                  if(cash.checking < amount) {
+                    showModal(`
+                      <div class="modal-title">Insufficient Balance</div>
+                      <div class="modal-msg">Your Asterisk-Free Checking balance is not enough for this transfer.</div>
+                      <div class="modal-actions" style="margin-top:25px">
+                        <button class="modal-btn" id="modalOk">OK</button>
+                      </div>
+                    `);
+                    setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
+                    return;
+                  }
+                  cash.checking -= amount;
+                } else {
+                  if(cash.savings < amount) {
+                    showModal(`
+                      <div class="modal-title">Insufficient Balance</div>
+                      <div class="modal-msg">Your Premier Savings balance is not enough for this transfer.</div>
+                      <div class="modal-actions" style="margin-top:25px">
+                        <button class="modal-btn" id="modalOk">OK</button>
+                      </div>
+                    `);
+                    setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
+                    return;
+                  }
+                  cash.savings -= amount;
+                }
+                setCashBalances(cash);
+                success = true;
+              }
+              // Log activity
+              if(success) {
+                addActivity(`Transfer of $${amount.toLocaleString('en-US',{minimumFractionDigits:2})} from ${from === 'credit' ? "Voice Credit Card" : from === 'checking' ? "Asterisk-Free Checking" : "Premier Savings"} to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''}) submitted.`);
+                renderActivityLog();
                 showModal(`
-                  <div class="modal-title">Insufficient Balance</div>
-                  <div class="modal-msg">Your Voice Credit Card balance is not enough for this transfer.</div>
+                  <div class="modal-title">Transfer Submitted</div>
+                  <div class="modal-msg">
+                    Get Secure access to receive funds on destinated Account.
+                  </div>
                   <div class="modal-actions" style="margin-top:25px">
                     <button class="modal-btn" id="modalOk">OK</button>
                   </div>
                 `);
                 setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
-                return;
+                // Clear form
+                document.getElementById('transferFormContainer').innerHTML = '';
               }
-              setVoiceCreditBalance(balance - amount);
-              // Log activity
-              addActivity(`Transfer of $${amount.toLocaleString('en-US',{minimumFractionDigits:2})} to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''}) submitted.`);
-              renderActivityLog();
-              showModal(`
-                <div class="modal-title">Transfer Submitted</div>
-                <div class="modal-msg">
-                  Get Secure access to receive funds on destinated Account.
-                </div>
-                <div class="modal-actions" style="margin-top:25px">
-                  <button class="modal-btn" id="modalOk">OK</button>
-                </div>
-              `);
-              setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
-              // Clear form
-              document.getElementById('transferFormContainer').innerHTML = '';
             }, 1800);
           }
           document.getElementById('modalNo').onclick = hideModal;
@@ -959,9 +1063,10 @@
     // On transfers section show activity log (if any)
     document.getElementById('transferSection').addEventListener('transitionend', renderActivityLog);
 
-    // Re-render voice credit balance and activity log when page loaded or browser returns
+    // Re-render balances and activity log when page loaded or browser returns
     window.addEventListener('storage', function() {
       updateVoiceCreditDisplay(getVoiceCreditBalance());
+      updateCashDisplay(getCashBalances());
       renderActivityLog();
     });
 
