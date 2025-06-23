@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Huntington Bank Dashboard Clone</title>
+  <meta name="viewport" content="width=375, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #44b649;
+      --dark-green: #10702f;
+      --gray-bg: #eef3f4;
+      --section-bg: #f0f4f7;
+      --border: #e1e8eb;
+      --tab-active: #222;
+      --tab-inactive: #8b8b8b;
+      --accent: #d5e6da;
+      --shadow: 0 2px 6px rgba(44,62,80,0.08);
+      --modal-bg: rgba(0,0,0,0.3);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--gray-bg);
+      font-family: 'Montserrat', Arial, sans-serif;
+      color: #222;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    body {
+      position: relative;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #44b649 70%, #10702f 100%);
+      color: #fff;
+      padding: 28px 0 15px 0;
+      text-align: center;
+      position: relative;
+      border-radius: 0 0 24px 24px;
+    }
+    .header .logo {
+      font-weight: bold;
+      font-size: 2.1rem;
+      letter-spacing: -1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .header .logo-icon {
+      font-weight: bold;
+      font-size: 2.3rem;
+      font-family: monospace;
+    }
+    .header .logout {
+      position: absolute;
+      top: 15px;
+      right: 18px;
+      color: #222;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      font-weight: 500;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .header .welcome {
+      font-size: 1.2rem;
+      margin: 6px 0 3px 0;
+      font-weight: 500;
+    }
+    .header .last-login {
+      font-size: 0.95rem;
+      color: #e1e8eb;
+      opacity: 0.9;
+      margin-bottom: -6px;
+    }
+
+    .tab-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f3f6f7;
+      padding: 0;
+      margin: 0;
+      font-size: 1.25rem;
+      border-bottom: 2px solid #dbe2e6;
+      gap: 35px;
+    }
+    .tab-row .tab {
+      padding: 18px 10px 10px 10px;
+      cursor: pointer;
+      color: var(--tab-inactive);
+      font-weight: 500;
+      border-bottom: 3px solid transparent;
+      flex: 1;
+      text-align: center;
+      transition: color 0.2s, border 0.2s;
+      background: none;
+      border: none;
+      outline: none;
+    }
+    .tab-row .tab.active {
+      color: var(--tab-active);
+      border-bottom: 3px solid #222;
+    }
+
+    .container {
+      padding: 20px 0 0 0;
+      max-width: 430px;
+      margin: 0 auto;
+    }
+    .section {
+      background: none;
+      margin-bottom: 18px;
+    }
+    .section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #444;
+    }
+    .section-count {
+      font-size: 1.1rem;
+      color: #666;
+      font-weight: 500;
+      margin-left: 7px;
+    }
+    .section-total {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #222;
+    }
+    .section-arrow {
+      font-size: 1.3rem;
+      color: #888;
+      margin-left: 7px;
+      transform: translateY(1px);
+    }
+    .account-list {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      margin-top: 6px;
+      margin-bottom: 10px;
+    }
+    .account-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 18px 16px 14px 16px;
+      border-top: 4px solid var(--green);
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 1.1rem;
+    }
+    .account-card .account-name {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #222;
+    }
+    .account-card .account-num {
+      color: #555;
+      font-size: 1.1rem;
+    }
+    .account-card .account-balance {
+      font-weight: 600;
+      font-size: 1.13rem;
+      color: #222;
+      text-align: right;
+      margin-top: 5px;
+    }
+    .account-card .account-details {
+      font-size: 0.98rem;
+      color: #888;
+      margin-top: 2px;
+    }
+    .account-card .account-balance-small {
+      font-size: 0.98rem;
+      color: #666;
+      text-align: right;
+      margin-top: 0;
+    }
+
+    .explore-products {
+      margin-bottom: 18px;
+    }
+    .explore-title {
+      font-size: 1.17rem;
+      font-weight: 600;
+      margin-bottom: 9px;
+      color: #444;
+    }
+    .product-card {
+      background: #fff;
+      border: 2px dashed #bfc5c9;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 17px 18px;
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+      box-shadow: none;
+    }
+    .product-card .product-icon {
+      font-size: 1.5rem;
+      margin-right: 7px;
+      color: #222;
+    }
+    .product-card .product-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+    .product-card .product-offer {
+      background: var(--green);
+      color: #fff;
+      border-radius: 7px;
+      font-size: 0.95rem;
+      padding: 3px 13px 3px 13px;
+      font-weight: 600;
+      margin-left: 13px;
+      white-space: nowrap;
+    }
+
+    .tools-section {
+      margin-top: 21px;
+      margin-bottom: 20px;
+    }
+    .tools-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .tools-title {
+      font-size: 1.17rem;
+      font-weight: 600;
+      color: #444;
+    }
+    .manage-dashboard {
+      font-size: 1rem;
+      color: var(--dark-green);
+      text-decoration: underline;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tools-list {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-bottom: 8px;
+      margin-top: 0;
+      padding: 0;
+    }
+    .tool-item {
+      background: #fff;
+      border-radius: 12px;
+      padding: 11px 13px 9px 13px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #444;
+      min-width: 70px;
+      text-align: center;
+      border: 2px solid transparent;
+      transition: border 0.2s;
+      cursor: pointer;
+    }
+    .tool-item.selected {
+      border: 2px solid var(--green);
+      color: var(--green);
+    }
+    .tool-item .tool-icon {
+      margin-bottom: 9px;
+      font-size: 2rem;
+    }
+    .tool-sep {
+      width: 2px;
+      height: 36px;
+      background: #e1e8eb;
+      margin: 0 7px;
+      border-radius: 1px;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      background: #222;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 61px;
+      z-index: 10;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      box-shadow: 0 -2px 8px rgba(44,62,80,0.08);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+      font-size: 1rem;
+      text-decoration: none;
+      padding: 4px 0 2px 0;
+      transition: color 0.2s;
+      min-width: 54px;
+      cursor: pointer;
+    }
+    .nav-item.active {
+      color: var(--green);
+      font-weight: 700;
+    }
+    .nav-item .nav-icon {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+    @media (max-width: 500px) {
+      .container {
+        max-width: 100vw;
+      }
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: var(--modal-bg);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: 13px;
+      padding: 30px 22px 19px 22px;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.13);
+      max-width: 90vw;
+      min-width: 270px;
+      text-align: center;
+      position: relative;
+    }
+    .modal-title {
+      font-size: 1.17rem;
+      font-weight: bold;
+      margin-bottom: 18px;
+      color: #222;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 17px;
+      justify-content: center;
+      margin-top: 21px;
+    }
+    .modal-btn {
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 19px;
+      cursor: pointer;
+      background: var(--green);
+      color: #fff;
+      transition: background 0.2s;
+    }
+    .modal-btn.cancel {
+      background: #bbb;
+    }
+    .modal-msg {
+      font-size: 1.09rem;
+      color: #333;
+      margin: 13px 0 0 0;
+    }
+    .modal-loading {
+      font-size: 1.1rem;
+      margin-top: 10px;
+    }
+    .modal-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--green);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px auto;
+      display: block;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+
+    /* Transfers Section */
+    .transfer-section {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--gray-bg);
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      z-index: 1001;
+      overflow-y: auto;
+      margin-bottom: 0;
+    }
+    .transfer-header {
+      background: linear-gradient(135deg, #44b649 70%, #10702f 100%);
+      color: #fff;
+      padding: 30px 0 20px 0;
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 700;
+      border-radius: 0 0 24px 24px;
+      letter-spacing: 1px;
+      margin-bottom: 25px;
+    }
+    .transfer-btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .transfer-btn {
+      padding: 12px 35px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 9px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      margin-top: 10px;
+    }
+    .transfer-btn.transfer {
+      background: var(--green);
+      color: #fff;
+      border: 2px solid var(--green);
+    }
+    .transfer-btn.paybills {
+      background: #fff;
+      color: var(--green);
+      border: 2px solid var(--green);
+    }
+    .transfer-form {
+      background: #fff;
+      border-radius: 10px;
+      padding: 25px 20px 18px 20px;
+      box-shadow: var(--shadow);
+      max-width: 90vw;
+      margin: 0 auto 16px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 17px;
+    }
+    .transfer-form label {
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: #222;
+      text-align: left;
+      display: block;
+    }
+    .transfer-form select, .transfer-form input {
+      padding: 9px 9px;
+      font-size: 1.05rem;
+      border-radius: 7px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      outline: none;
+      background: #f6f9f9;
+    }
+    .transfer-form input:focus, .transfer-form select:focus {
+      border-color: var(--green);
+    }
+    .transfer-form .confirm-btn {
+      margin-top: 15px;
+      padding: 11px 0;
+      background: var(--green);
+      color: #fff;
+      font-size: 1.11rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .transfer-close {
+      position: absolute;
+      right: 20px;
+      top: 18px;
+      font-size: 1.7rem;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+    }
+    /* Activities log */
+    .activity-log-section {
+      background: #fff;
+      border-radius: 10px;
+      padding: 18px 16px 8px 16px;
+      box-shadow: var(--shadow);
+      margin: 22px 10px 25px 10px;
+    }
+    .activity-log-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 10px;
+    }
+    .activity-log-list {
+      font-size: 1rem;
+      color: #444;
+      text-align: left;
+      list-style: disc inside;
+      margin-bottom: 0;
+      padding-left: 16px;
+    }
+    .activity-log-list li {
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <button class="logout" id="logoutBtn">Log Out</button>
+    <div class="logo">
+      <span class="logo-icon">🟩</span>
+      Huntington
+    </div>
+    <div class="welcome">Welcome, Sheree Kiti</div>
+    <div class="last-login">You last logged in 04/12/2024 at 12:30 p.m. ET</div>
+  </div>
+
+  <div class="tab-row">
+    <button class="tab active">Huntington</button>
+    <button class="tab">All Accounts</button>
+  </div>
+
+  <div class="container" id="mainContainer">
+
+    <!-- Cash Section -->
+    <div class="section">
+      <div class="section-title-row">
+        <span class="section-title">Cash <span class="section-count">(2)</span></span>
+        <span class="section-total">$11,049.90</span>
+        <span class="section-arrow">&#9650;</span>
+      </div>
+      <div class="account-list">
+        <div class="account-card">
+          <div>
+            <div class="account-name">Asterisk-Free Checking... 1234</div>
+          </div>
+          <div class="account-balance">$834.56</div>
+        </div>
+        <div class="account-card">
+          <div>
+            <div class="account-name">Premier Savings... 5555</div>
+          </div>
+          <div class="account-balance">$10,215.34</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Credit Section -->
+    <div class="section" id="creditSection">
+      <div class="section-title-row">
+        <span class="section-title">Credit <span class="section-count">(1)</span></span>
+        <span class="section-total" id="voiceCreditBalance">$2,347.31</span>
+        <span class="section-arrow">&#9650;</span>
+      </div>
+      <div class="account-list">
+        <div class="account-card">
+          <div>
+            <div class="account-name">Voice Credit Card...9968</div>
+            <div class="account-details"><span id="voiceCreditAvail">$1,302.00</span><br>available credit</div>
+          </div>
+          <div>
+            <div class="account-balance" id="voiceCreditBalance2">$2,347.31</div>
+            <div class="account-balance-small">current balance</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Explore Products -->
+    <div class="explore-products">
+      <div class="explore-title">Explore Products</div>
+      <div class="product-card" id="accountsMoreBtn">
+        <div class="product-label">
+          <span class="product-icon">＋</span>
+          Accounts and More
+        </div>
+        <span class="product-offer">Offers Available</span>
+      </div>
+    </div>
+
+    <!-- Tools -->
+    <div class="tools-section">
+      <div class="tools-title-row">
+        <div class="tools-title">Tools</div>
+        <div class="manage-dashboard" id="manageDashboardBtn">&#9881; Manage Dashboard</div>
+      </div>
+      <div class="tools-list">
+        <div class="tool-item selected" id="spendingBtn">
+          <div class="tool-icon">🟢</div>
+          Spending
+        </div>
+        <div class="tool-item" id="budgetingBtn">
+          <div class="tool-icon">≡</div>
+          Budgeting
+        </div>
+        <span class="tool-sep"></span>
+        <div class="tool-item" id="goalsBtn">
+          <div class="tool-icon">🏆</div>
+          Goals
+        </div>
+        <div class="tool-item" id="planningBtn">
+          <div class="tool-icon">🗓️</div>
+          Planning
+        </div>
+      </div>
+    </div>
+    <!-- Padding for bottom navigation -->
+    <div style="height: 70px;"></div>
+  </div>
+
+  <!-- Transfers Section (hidden by default) -->
+  <div class="transfer-section" id="transferSection">
+    <div class="transfer-header">
+      Transfers
+      <button class="transfer-close" id="closeTransferSection">&times;</button>
+    </div>
+    <div class="transfer-btn-row">
+      <button class="transfer-btn transfer" id="transferActionBtn">Transfer</button>
+      <button class="transfer-btn paybills" id="payBillsBtn">Pay Bills</button>
+    </div>
+    <div id="transferFormContainer"></div>
+    <div class="activity-log-section" style="display:none;" id="activityLogSection">
+      <div class="activity-log-title">Ongoing Activities</div>
+      <ul class="activity-log-list" id="activityLogList"></ul>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <a href="#" class="nav-item active" id="hubBtn">
+      <span class="nav-icon">⬢</span>
+      The Hub
+    </a>
+    <a href="#" class="nav-item" id="paymentsBtn">
+      <span class="nav-icon">💸</span>
+      Payments
+    </a>
+    <a href="#" class="nav-item" id="transfersBtn">
+      <span class="nav-icon">➡️</span>
+      Transfers
+    </a>
+    <a href="#" class="nav-item" id="depositsBtn">
+      <span class="nav-icon">🖼️</span>
+      Deposits
+    </a>
+    <a href="#" class="nav-item" id="moreBtn">
+      <span class="nav-icon">⋯</span>
+      More
+    </a>
+  </div>
+
+  <!-- Modal/Popup -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box" id="modalBox">
+      <!-- Content injected by JS -->
+    </div>
+  </div>
+  <script>
+    // Helper: show modal with custom content
+    function showModal(contentHtml) {
+      const overlay = document.getElementById('modalOverlay');
+      const box = document.getElementById('modalBox');
+      box.innerHTML = contentHtml;
+      overlay.classList.add('active');
+    }
+    function hideModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    // Loading modal with spinner and message
+    function showLoadingModal(message = 'Loading...') {
+      showModal(`
+        <div class="modal-spinner"></div>
+        <div class="modal-loading">${message}</div>
+      `);
+    }
+
+    // Activity Log helpers (using localStorage)
+    function getActivities() {
+      try {
+        return JSON.parse(localStorage.getItem('activityLog') || '[]');
+      } catch (e) { return []; }
+    }
+    function setActivities(logs) {
+      localStorage.setItem('activityLog', JSON.stringify(logs));
+    }
+    function addActivity(msg) {
+      let logs = getActivities();
+      logs.unshift({
+        msg,
+        time: new Date().toLocaleString()
+      });
+      setActivities(logs);
+    }
+    function renderActivityLog() {
+      const logs = getActivities();
+      const ul = document.getElementById('activityLogList');
+      if(!ul) return;
+      ul.innerHTML = '';
+      logs.forEach(log => {
+        let li = document.createElement('li');
+        li.textContent = `[${log.time}] ${log.msg}`;
+        ul.appendChild(li);
+      });
+      // Show/hide section
+      document.getElementById('activityLogSection').style.display = logs.length ? 'block' : 'none';
+    }
+
+    // Save/retrieve Voice Credit balance (for localStorage, persistent)
+    function getVoiceCreditBalance() {
+      return parseFloat(localStorage.getItem('voiceCreditBalance') || "2347.31");
+    }
+    function setVoiceCreditBalance(val) {
+      localStorage.setItem('voiceCreditBalance', val.toFixed(2));
+      updateVoiceCreditDisplay(val);
+    }
+    function updateVoiceCreditDisplay(val) {
+      document.getElementById('voiceCreditBalance').innerText = '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2});
+      document.getElementById('voiceCreditBalance2').innerText = '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2});
+    }
+
+    // On load, update Voice Credit balance and render activity log if on transfers section
+    document.addEventListener('DOMContentLoaded', function() {
+      updateVoiceCreditDisplay(getVoiceCreditBalance());
+      renderActivityLog();
+    });
+
+    // Logout button logic
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+      showModal(`
+        <div class="modal-title">Are you sure you want to logout?</div>
+        <div class="modal-actions">
+          <button class="modal-btn" id="modalYes">Yes</button>
+          <button class="modal-btn cancel" id="modalNo">No</button>
+        </div>
+      `);
+      setTimeout(() => {
+        document.getElementById('modalYes').onclick = function() {
+          showModal(`
+            <div class="modal-title">Sorry</div>
+            <div class="modal-msg">You can't Logout because the Action isn't supported right now</div>
+            <div class="modal-actions" style="margin-top:25px">
+              <button class="modal-btn" id="modalOk">OK</button>
+            </div>
+          `);
+          setTimeout(() => {
+            document.getElementById('modalOk').onclick = hideModal;
+          }, 20);
+        }
+        document.getElementById('modalNo').onclick = hideModal;
+      }, 20);
+    });
+
+    // Helper: loading + timeout modal
+    function showLoadingTimeoutModal() {
+      showLoadingModal();
+      setTimeout(() => {
+        showModal(`
+          <div class="modal-title">Connection timeout</div>
+          <div class="modal-msg">Try Again!</div>
+          <div class="modal-actions" style="margin-top:25px">
+            <button class="modal-btn" id="modalOk">OK</button>
+          </div>
+        `);
+        setTimeout(() => {
+          document.getElementById('modalOk').onclick = hideModal;
+        }, 20);
+      }, 2000);
+    }
+
+    // Attach loading+timeout to all "other" buttons except Transfers (special)
+    [
+      'accountsMoreBtn','manageDashboardBtn','spendingBtn','budgetingBtn','goalsBtn','planningBtn',
+      'hubBtn','paymentsBtn','depositsBtn','moreBtn'
+    ].forEach(function(id){
+      const el = document.getElementById(id);
+      if(el) el.addEventListener('click', function(e){
+        if(el.tagName === 'A') e.preventDefault();
+        showLoadingTimeoutModal();
+      });
+    });
+
+    // Transfers navigation
+    const mainContainer = document.getElementById('mainContainer');
+    const transferSection = document.getElementById('transferSection');
+    document.getElementById('transfersBtn').addEventListener('click', function(e){
+      e.preventDefault();
+      mainContainer.style.display = 'none';
+      transferSection.style.display = 'flex';
+      renderActivityLog();
+    });
+    document.getElementById('closeTransferSection').addEventListener('click', function(){
+      transferSection.style.display = 'none';
+      mainContainer.style.display = '';
+    });
+
+    // Pay Bills Button
+    document.getElementById('payBillsBtn').addEventListener('click', function(){
+      showModal(`
+        <div class="modal-title">Pay Bills</div>
+        <div class="modal-msg">Access with the Application or Visit our live location</div>
+        <div class="modal-actions" style="margin-top:25px">
+          <button class="modal-btn" id="modalOk">OK</button>
+        </div>
+      `);
+      setTimeout(function(){
+        document.getElementById('modalOk').onclick = hideModal;
+      }, 20);
+    });
+
+    // Transfer Button (show form)
+    document.getElementById('transferActionBtn').addEventListener('click', function(){
+      showTransferForm();
+    });
+
+    // US Top 20 banks (including requested fintechs)
+    const usBanks = [
+      "JPMorgan Chase", "Bank of America", "Wells Fargo", "Citibank", "U.S. Bank",
+      "PNC Bank", "Truist", "Goldman Sachs", "TD Bank", "Capital One",
+      "Charles Schwab", "Fifth Third Bank", "HSBC", "BMO Harris", "Ally Bank",
+      "Chime", "Cash App", "Zelle", "Regions Bank", "KeyBank"
+    ];
+
+    function showTransferForm() {
+      document.getElementById('transferFormContainer').innerHTML = `
+        <form class="transfer-form" id="transferForm">
+          <label for="bankSelect">Select Bank</label>
+          <select id="bankSelect" required>
+            <option value="">-- Select Bank --</option>
+            ${usBanks.map(b => `<option value="${b}">${b}</option>`).join('')}
+          </select>
+          <label for="accountNum">Account Number</label>
+          <input type="text" id="accountNum" required placeholder="Enter account number" maxlength="20" pattern="\\d+">
+          <label for="routingNum">Routing Number <span style="color:#888;font-weight:400">(if needed)</span></label>
+          <input type="text" id="routingNum" placeholder="Enter routing number" maxlength="9" pattern="\\d*">
+          <label for="amount">Amount</label>
+          <input type="number" id="amount" required placeholder="Enter amount to transfer" min="1" step="0.01" max="100000">
+          <button type="submit" class="confirm-btn">Confirm</button>
+        </form>
+      `;
+      document.getElementById('transferForm').onsubmit = function(e){
+        e.preventDefault();
+        const bank = document.getElementById('bankSelect').value;
+        const acc = document.getElementById('accountNum').value.trim();
+        const routing = document.getElementById('routingNum').value.trim();
+        const amount = parseFloat(document.getElementById('amount').value);
+        if(!bank || !acc || !amount || amount <= 0) {
+          showModal(`
+            <div class="modal-title">Error</div>
+            <div class="modal-msg">Please fill all required fields properly.</div>
+            <div class="modal-actions" style="margin-top:25px">
+              <button class="modal-btn" id="modalOk">OK</button>
+            </div>
+          `);
+          setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
+          return;
+        }
+        // Confirm dialog
+        showModal(`
+          <div class="modal-title">Confirm Transfer</div>
+          <div class="modal-msg">
+            Bank: <b>${bank}</b><br>
+            Account: <b>${acc}</b><br>
+            ${routing ? 'Routing: <b>'+routing+'</b><br>' : ''}
+            Amount: <b>$${amount.toLocaleString('en-US',{minimumFractionDigits:2})}</b>
+          </div>
+          <div class="modal-actions" style="margin-top:25px">
+            <button class="modal-btn" id="modalYes">Confirm</button>
+            <button class="modal-btn cancel" id="modalNo">Cancel</button>
+          </div>
+        `);
+        setTimeout(() => {
+          document.getElementById('modalYes').onclick = function() {
+            showLoadingModal('Submitting...');
+            setTimeout(function(){
+              // Reduce voice credit balance
+              let balance = getVoiceCreditBalance();
+              if(balance < amount) {
+                showModal(`
+                  <div class="modal-title">Insufficient Balance</div>
+                  <div class="modal-msg">Your Voice Credit Card balance is not enough for this transfer.</div>
+                  <div class="modal-actions" style="margin-top:25px">
+                    <button class="modal-btn" id="modalOk">OK</button>
+                  </div>
+                `);
+                setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
+                return;
+              }
+              setVoiceCreditBalance(balance - amount);
+              // Log activity
+              addActivity(`Transfer of $${amount.toLocaleString('en-US',{minimumFractionDigits:2})} to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''}) submitted.`);
+              renderActivityLog();
+              showModal(`
+                <div class="modal-title">Transfer Submitted</div>
+                <div class="modal-msg">
+                  Get Secure access to receive funds on destinated Account.
+                </div>
+                <div class="modal-actions" style="margin-top:25px">
+                  <button class="modal-btn" id="modalOk">OK</button>
+                </div>
+              `);
+              setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
+              // Clear form
+              document.getElementById('transferFormContainer').innerHTML = '';
+            }, 1800);
+          }
+          document.getElementById('modalNo').onclick = hideModal;
+        }, 20);
+      };
+    }
+
+    // Modal close on overlay click (optional)
+    document.getElementById('modalOverlay').addEventListener('click', function(e){
+      if(e.target === this) hideModal();
+    });
+
+    // On transfers section show activity log (if any)
+    document.getElementById('transferSection').addEventListener('transitionend', renderActivityLog);
+
+    // Re-render voice credit balance and activity log when page loaded or browser returns
+    window.addEventListener('storage', function() {
+      updateVoiceCreditDisplay(getVoiceCreditBalance());
+      renderActivityLog();
+    });
+
+  </script>
+</body>
+</html>
