@@ -1030,7 +1030,10 @@
         </form>
       `;
       // Always show confirm button; prevent submit on mobile when pressing "enter" on amount field
-      
+      document.getElementById('transferForm').addEventListener('keydown', function(e) {
+        if (e.key === "Enter" && e.target.id === "amount") {
+          e.preventDefault();
+        }
       });
       document.getElementById('transferForm').onsubmit = function(e){
         e.preventDefault();
