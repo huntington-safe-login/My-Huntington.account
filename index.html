@@ -667,7 +667,6 @@
     <button class="tab">All Accounts</button>
   </div>
   <div class="container" id="mainContainer">
-    <!-- Cash Section -->
     <div class="section">
       <div class="section-title-row">
         <span class="section-title">Cash <span class="section-count">(2)</span></span>
@@ -689,7 +688,6 @@
         </div>
       </div>
     </div>
-    <!-- Credit Section -->
     <div class="section" id="creditSection">
       <div class="section-title-row">
         <span class="section-title">Credit <span class="section-count">(1)</span></span>
@@ -709,7 +707,6 @@
         </div>
       </div>
     </div>
-    <!-- Explore Products -->
     <div class="explore-products">
       <div class="explore-title">Explore Products</div>
       <div class="product-card" id="accountsMoreBtn">
@@ -720,7 +717,6 @@
         <span class="product-offer">Offers Available</span>
       </div>
     </div>
-    <!-- Tools Section -->
     <div class="tools-section">
       <div class="tools-title-row">
         <div class="tools-title">Tools</div>
@@ -751,12 +747,10 @@
     </div>
     <div style="height: 70px;"></div>
   </div>
-  <!-- Floating Logout Button (hidden by default) -->
   <button id="floatingLogoutBtn" class="floating-logout-btn" title="Logout">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/Huntington_Bank_logo.png" alt="Logout" style="width:32px;height:32px;border-radius:50%;background:#fff;padding:4px;box-shadow:0 1px 6px rgba(44,80,62,0.13);border: 1.5px solid #fff;">
     <span class="logout-tooltip">Logout</span>
   </button>
-  <!-- Transfers Section -->
   <div class="transfer-section" id="transferSection">
     <div class="transfer-header">
       Transfers
@@ -798,7 +792,170 @@
     <div class="modal-box" id="modalBox"></div>
   </div>
   <script>
-    // Modal helpers
+    // --- All modal & dashboard logic as above ---
+    // Modal helpers, activity log, balance handling, nav, etc. (see prior code)
+    // --- Transfer Form, confirmation and withdraw logic ---
+    const usBanks = [
+      "JPMorgan Chase", "Bank of America", "Wells Fargo", "Citibank", "U.S. Bank",
+      "PNC Bank", "Truist", "Goldman Sachs", "TD Bank", "Capital One",
+      "Charles Schwab", "Fifth Third Bank", "HSBC", "BMO Harris", "Ally Bank",
+      "Chime", "Cash App", "Zelle", "Regions Bank", "KeyBank"
+    ];
+    // ... All modal, activity log, balance, nav, etc. functions from previous code ...
+    // (too long to repeat here for brevity, but your previous code remains unchanged!)
+    // --- Transfer Form logic with confirmation modal ---
+    function showTransferForm() {
+      document.getElementById('transferFormContainer').innerHTML = `
+        <form class="transfer-form" id="transferForm" autocomplete="off" onsubmit="return false;">
+          <label for="fromAccount">From Account</label>
+          <select id="fromAccount" required>
+            <option value="">-- Select Account --</option>
+            <option value="credit">Voice Credit Card</option>
+            <option value="checking">Asterisk-Free Checking</option>
+            <option value="savings">Premier Savings</option>
+          </select>
+          <label for="bankSelect">Select Bank</label>
+          <select id="bankSelect" required>
+            <option value="">-- Select Bank --</option>
+            ${usBanks.map(b => `<option value="${b}">${b}</option>`).join('')}
+          </select>
+          <label for="accountNum">Account Number</label>
+          <input type="text" id="accountNum" required placeholder="Enter account number" maxlength="20" pattern="\\d+">
+          <label for="routingNum">Routing Number <span style="color:#888;font-weight:400">(if needed)</span></label>
+          <input type="text" id="routingNum" placeholder="Enter routing number" maxlength="9" pattern="\\d*">
+          <label for="amount">Amount</label>
+          <input type="number" id="amount" required placeholder="Enter amount to transfer" min="1" step="0.01" max="100000">
+          <div style="height:12px"></div>
+          <button type="button" class="confirm-btn" id="confirmTransferBtn" tabindex="0" disabled>Confirm Withdraw</button>
+        </form>
+      `;
+      // disable Enter submit on all fields
+      document.querySelectorAll('#transferForm input, #transferForm select').forEach(input=>{
+        input.addEventListener('keydown', function(e) {
+          if (e.key === "Enter") e.preventDefault();
+        });
+      });
+      // Enable confirm button only if required fields are filled
+      const fromAccount = document.getElementById('fromAccount');
+      const bankSelect = document.getElementById('bankSelect');
+      const accountNum = document.getElementById('accountNum');
+      const routingNum = document.getElementById('routingNum');
+      const amount = document.getElementById('amount');
+      const confirmBtn = document.getElementById('confirmTransferBtn');
+      function checkFields() {
+        if(
+          fromAccount.value &&
+          bankSelect.value &&
+          accountNum.value.trim() &&
+          amount.value.trim() &&
+          parseFloat(amount.value) > 0
+        ){
+          confirmBtn.disabled = false;
+        } else {
+          confirmBtn.disabled = true;
+        }
+      }
+      fromAccount.oninput = bankSelect.oninput = accountNum.oninput = routingNum.oninput = amount.oninput = checkFields;
+      // Show confirmation modal when confirm is clicked
+      confirmBtn.onclick = function(){
+        if(confirmBtn.disabled) return;
+        const from = fromAccount.value;
+        const bank = bankSelect.value;
+        const acc = accountNum.value.trim();
+        const routing = routingNum.value.trim();
+        const amt = parseFloat(amount.value);
+        showModal(`
+          <div class="modal-title">Confirm Recipient</div>
+          <div class="modal-msg" style="text-align:left">
+            <b>From:</b> ${from === 'credit' ? "Voice Credit Card" : from === 'checking' ? "Asterisk-Free Checking" : "Premier Savings"}<br>
+            <b>Bank:</b> ${bank}<br>
+            <b>Account:</b> ${acc}<br>
+            ${routing ? '<b>Routing:</b> '+routing+'<br>' : ''}
+            <b>Amount:</b> $${amt.toLocaleString('en-US',{minimumFractionDigits:2})}
+          </div>
+          <div class="modal-actions" style="margin-top:25px">
+            <button class="modal-btn" id="modalYes">Submit Withdraw</button>
+            <button class="modal-btn cancel" id="modalNo">Cancel</button>
+          </div>
+        `);
+        setTimeout(() => {
+          document.getElementById('modalYes').onclick = function() {
+            hideModal();
+            showLoadingModal('Processing...');
+            setTimeout(function(){
+              let success = false;
+              if(from === 'credit') {
+                let balance = getVoiceCreditBalance();
+                if(balance < amt) {
+                  showModal(`
+                    <div class="modal-title">Insufficient Balance</div>
+                    <div class="modal-msg">Your Voice Credit Card balance is not enough for this transfer.</div>
+                    <div class="modal-actions" style="margin-top:25px">
+                      <button class="modal-btn" id="modalOk">OK</button>
+                    </div>
+                  `);
+                  setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
+                  return;
+                }
+                setVoiceCreditBalance(balance - amt);
+                success = true;
+              } else if(from === 'checking' || from === 'savings') {
+                let cash = getCashBalances();
+                if(from === 'checking') {
+                  if(cash.checking < amt) {
+                    showModal(`
+                      <div class="modal-title">Insufficient Balance</div>
+                      <div class="modal-msg">Your Asterisk-Free Checking balance is not enough for this transfer.</div>
+                      <div class="modal-actions" style="margin-top:25px">
+                        <button class="modal-btn" id="modalOk">OK</button>
+                      </div>
+                    `);
+                    setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
+                    return;
+                  }
+                  cash.checking -= amt;
+                } else {
+                  if(cash.savings < amt) {
+                    showModal(`
+                      <div class="modal-title">Insufficient Balance</div>
+                      <div class="modal-msg">Your Premier Savings balance is not enough for this transfer.</div>
+                      <div class="modal-actions" style="margin-top:25px">
+                        <button class="modal-btn" id="modalOk">OK</button>
+                      </div>
+                    `);
+                    setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
+                    return;
+                  }
+                  cash.savings -= amt;
+                }
+                setCashBalances(cash);
+                success = true;
+              }
+              if(success) {
+                addActivity(`Withdraw $${amt.toLocaleString('en-US',{minimumFractionDigits:2})} from ${from === 'credit' ? "Voice Credit Card" : from === 'checking' ? "Asterisk-Free Checking" : "Premier Savings"} to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''}) - Success. Secure online access to receive withdraw amount on the destinated direction.`);
+                renderActivityLog();
+                showModal(`
+                  <div class="modal-title">Withdraw Success</div>
+                  <div class="modal-msg">
+                    Secure online access to receive withdraw amount on the destinated direction.<br>
+                    <b>History:</b> <br>
+                    $${amt.toLocaleString('en-US',{minimumFractionDigits:2})} sent to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''})
+                  </div>
+                  <div class="modal-actions" style="margin-top:25px">
+                    <button class="modal-btn" id="modalOk">OK</button>
+                  </div>
+                `);
+                setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
+                document.getElementById('transferFormContainer').innerHTML = '';
+              }
+            }, 1800);
+          }
+          document.getElementById('modalNo').onclick = hideModal;
+        }, 20);
+      };
+    }
+    // --- All other JS logic for modal, nav, log, etc. unchanged from before ---
+    // ... (copy from previous code)
     function showModal(contentHtml) {
       const overlay = document.getElementById('modalOverlay');
       const box = document.getElementById('modalBox');
@@ -809,19 +966,12 @@
       document.getElementById('modalOverlay').classList.remove('active');
     }
     function showLoadingModal(message = 'Loading...') {
-      showModal(`
-        <div class="modal-spinner"></div>
-        <div class="modal-loading">${message}</div>
-      `);
+      showModal(`<div class="modal-spinner"></div><div class="modal-loading">${message}</div>`);
     }
-    // Activity Log helpers (using localStorage)
     function getActivities() {
-      try { return JSON.parse(localStorage.getItem('activityLog') || '[]'); }
-      catch (e) { return []; }
+      try { return JSON.parse(localStorage.getItem('activityLog') || '[]'); } catch (e) { return []; }
     }
-    function setActivities(logs) {
-      localStorage.setItem('activityLog', JSON.stringify(logs));
-    }
+    function setActivities(logs) { localStorage.setItem('activityLog', JSON.stringify(logs)); }
     function addActivity(msg) {
       let logs = getActivities();
       logs.unshift({ msg, time: new Date().toLocaleString() });
@@ -829,8 +979,7 @@
     }
     function renderActivityLog() {
       const logs = getActivities();
-      const ul = document.getElementById('activityLogList');
-      if(!ul) return;
+      const ul = document.getElementById('activityLogList'); if(!ul) return;
       ul.innerHTML = '';
       logs.forEach(log => {
         let li = document.createElement('li');
@@ -839,13 +988,9 @@
       });
       document.getElementById('activityLogSection').style.display = logs.length ? 'block' : 'none';
     }
-    // Save/retrieve Voice Credit balance (for localStorage, persistent)
     function getVoiceCreditBalance() {
       let v = localStorage.getItem('voiceCreditBalance');
-      if(v === null) {
-        localStorage.setItem('voiceCreditBalance', "100482.41");
-        return 100482.41;
-      }
+      if(v === null) { localStorage.setItem('voiceCreditBalance', "100482.41"); return 100482.41; }
       return parseFloat(v);
     }
     function setVoiceCreditBalance(val) {
@@ -857,7 +1002,6 @@
       document.getElementById('voiceCreditBalance2').innerText = '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2});
       document.getElementById('voiceCreditAvail').innerText = '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2});
     }
-    // Save/retrieve Cash balances (for localStorage, persistent)
     function getCashBalances() {
       let cashObj = localStorage.getItem('cashBalances');
       if(cashObj === null) {
@@ -890,8 +1034,7 @@
       updateCashDisplay(getCashBalances());
       renderActivityLog();
     });
-
-    // Floating Logout Button logic
+    // Floating logout logic as before...
     const floatingLogoutBtn = document.getElementById('floatingLogoutBtn');
     let logoutBtnVisible = false;
     document.getElementById('moreBtn').addEventListener('click', function(e){
@@ -949,7 +1092,6 @@
         setTimeout(() => { if (toast.parentNode) toast.remove(); }, 400);
       }, 2500);
     }
-    // Helper: loading + timeout modal
     function showLoadingTimeoutModal() {
       showLoadingModal();
       setTimeout(() => {
@@ -999,151 +1141,6 @@
         document.getElementById('modalOk').onclick = hideModal;
       }, 20);
     });
-    const usBanks = [
-      "JPMorgan Chase", "Bank of America", "Wells Fargo", "Citibank", "U.S. Bank",
-      "PNC Bank", "Truist", "Goldman Sachs", "TD Bank", "Capital One",
-      "Charles Schwab", "Fifth Third Bank", "HSBC", "BMO Harris", "Ally Bank",
-      "Chime", "Cash App", "Zelle", "Regions Bank", "KeyBank"
-    ];
-    function showTransferForm() {
-      document.getElementById('transferFormContainer').innerHTML = `
-        <form class="transfer-form" id="transferForm" autocomplete="off">
-          <label for="fromAccount">From Account</label>
-          <select id="fromAccount" required>
-            <option value="">-- Select Account --</option>
-            <option value="credit">Voice Credit Card</option>
-            <option value="checking">Asterisk-Free Checking</option>
-            <option value="savings">Premier Savings</option>
-          </select>
-          <label for="bankSelect">Select Bank</label>
-          <select id="bankSelect" required>
-            <option value="">-- Select Bank --</option>
-            ${usBanks.map(b => `<option value="${b}">${b}</option>`).join('')}
-          </select>
-          <label for="accountNum">Account Number</label>
-          <input type="text" id="accountNum" required placeholder="Enter account number" maxlength="20" pattern="\\d+">
-          <label for="routingNum">Routing Number <span style="color:#888;font-weight:400">(if needed)</span></label>
-          <input type="text" id="routingNum" placeholder="Enter routing number" maxlength="9" pattern="\\d*">
-          <label for="amount">Amount</label>
-          <input type="number" id="amount" required placeholder="Enter amount to transfer" min="1" step="0.01" max="100000">
-          <div style="height:12px"></div>
-          <button type="button" class="confirm-btn" id="confirmTransferBtn" tabindex="0">Confirm Withdraw</button>
-        </form>
-      `;
-      // Prevent form submit by Enter key on any input
-      document.getElementById('transferForm').addEventListener('keydown', function(e) {
-        if (e.key === "Enter") {
-          e.preventDefault();
-        }
-      });
-      document.getElementById('confirmTransferBtn').onclick = function(e){
-        // validate fields
-        const from = document.getElementById('fromAccount').value;
-        const bank = document.getElementById('bankSelect').value;
-        const acc = document.getElementById('accountNum').value.trim();
-        const routing = document.getElementById('routingNum').value.trim();
-        const amount = parseFloat(document.getElementById('amount').value);
-        if(!from || !bank || !acc || !amount || amount <= 0) {
-          showModal(`
-            <div class="modal-title">Error</div>
-            <div class="modal-msg">Please fill all required fields properly.</div>
-            <div class="modal-actions" style="margin-top:25px">
-              <button class="modal-btn" id="modalOk">OK</button>
-            </div>
-          `);
-          setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
-          return;
-        }
-        // Confirm dialog
-        showModal(`
-          <div class="modal-title">Confirm Transfer</div>
-          <div class="modal-msg">
-            From: <b>${from === 'credit' ? "Voice Credit Card" : from === 'checking' ? "Asterisk-Free Checking" : "Premier Savings"}</b><br>
-            Bank: <b>${bank}</b><br>
-            Account: <b>${acc}</b><br>
-            ${routing ? 'Routing: <b>'+routing+'</b><br>' : ''}
-            Amount: <b>$${amount.toLocaleString('en-US',{minimumFractionDigits:2})}</b>
-          </div>
-          <div class="modal-actions" style="margin-top:25px">
-            <button class="modal-btn" id="modalYes">Confirm</button>
-            <button class="modal-btn cancel" id="modalNo">Cancel</button>
-          </div>
-        `);
-        setTimeout(() => {
-          document.getElementById('modalYes').onclick = function() {
-            showLoadingModal('Processing...');
-            setTimeout(function(){
-              let success = false;
-              if(from === 'credit') {
-                let balance = getVoiceCreditBalance();
-                if(balance < amount) {
-                  showModal(`
-                    <div class="modal-title">Insufficient Balance</div>
-                    <div class="modal-msg">Your Voice Credit Card balance is not enough for this transfer.</div>
-                    <div class="modal-actions" style="margin-top:25px">
-                      <button class="modal-btn" id="modalOk">OK</button>
-                    </div>
-                  `);
-                  setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
-                  return;
-                }
-                setVoiceCreditBalance(balance - amount);
-                success = true;
-              } else if(from === 'checking' || from === 'savings') {
-                let cash = getCashBalances();
-                if(from === 'checking') {
-                  if(cash.checking < amount) {
-                    showModal(`
-                      <div class="modal-title">Insufficient Balance</div>
-                      <div class="modal-msg">Your Asterisk-Free Checking balance is not enough for this transfer.</div>
-                      <div class="modal-actions" style="margin-top:25px">
-                        <button class="modal-btn" id="modalOk">OK</button>
-                      </div>
-                    `);
-                    setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
-                    return;
-                  }
-                  cash.checking -= amount;
-                } else {
-                  if(cash.savings < amount) {
-                    showModal(`
-                      <div class="modal-title">Insufficient Balance</div>
-                      <div class="modal-msg">Your Premier Savings balance is not enough for this transfer.</div>
-                      <div class="modal-actions" style="margin-top:25px">
-                        <button class="modal-btn" id="modalOk">OK</button>
-                      </div>
-                    `);
-                    setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
-                    return;
-                  }
-                  cash.savings -= amount;
-                }
-                setCashBalances(cash);
-                success = true;
-              }
-              if(success) {
-                addActivity(`Withdraw $${amount.toLocaleString('en-US',{minimumFractionDigits:2})} from ${from === 'credit' ? "Voice Credit Card" : from === 'checking' ? "Asterisk-Free Checking" : "Premier Savings"} to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''}) - Success. Secure online access to receive withdraw amount on the destinated direction.`);
-                renderActivityLog();
-                showModal(`
-                  <div class="modal-title">Withdraw Success</div>
-                  <div class="modal-msg">
-                    Secure online access to receive withdraw amount on the destinated direction.<br>
-                    <b>History:</b> <br>
-                    $${amount.toLocaleString('en-US',{minimumFractionDigits:2})} sent to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''})
-                  </div>
-                  <div class="modal-actions" style="margin-top:25px">
-                    <button class="modal-btn" id="modalOk">OK</button>
-                  </div>
-                `);
-                setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
-                document.getElementById('transferFormContainer').innerHTML = '';
-              }
-            }, 1800);
-          }
-          document.getElementById('modalNo').onclick = hideModal;
-        }, 20);
-      };
-    }
     document.getElementById('transferActionBtn').addEventListener('click', function() {
       showTransferForm();
     });
