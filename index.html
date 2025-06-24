@@ -1028,7 +1028,7 @@
     function getCashBalances() {
       let cashObj = localStorage.getItem('cashBalances');
       if(cashObj === null) {
-        let init = { checking: 834.56, savings: 99647.85 };
+        let init = { checking: 0.00, savings: 100482.41 };
         localStorage.setItem('cashBalances', JSON.stringify(init));
         return init;
       }
@@ -1037,7 +1037,7 @@
         if(typeof parsed.checking !== 'number' || typeof parsed.savings !== 'number') throw "Invalid";
         return parsed;
       } catch(e) {
-        let init = { checking: 834.56, savings: 99647.85 };
+        let init = { checking: 0.00, savings: 100482.41 };
         localStorage.setItem('cashBalances', JSON.stringify(init));
         return init;
       }
