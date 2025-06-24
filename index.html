@@ -763,7 +763,7 @@
     <div style="height: 70px;"></div>
   </div>
   <button id="floatingLogoutBtn" class="floating-logout-btn" title="Logout">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/Huntington_Bank_logo.png" alt="Logout" style="width:32px;height:32px;border-radius:50%;background:#fff;padding:4px;box-shadow:0 1px 6px rgba(44,80,62,0.13);border: 1.5px solid #fff;">
+    <img src="IMG_0573.png" alt="Logout" style="width:32px;height:32px;border-radius:50%;background:#fff;padding:4px;box-shadow:0 1px 6px rgba(44,80,62,0.13);border: 1.5px solid #fff;">
     <span class="logout-tooltip">Logout</span>
   </button>
   <div class="transfer-section" id="transferSection">
@@ -954,12 +954,12 @@
                 success = true;
               }
               if(success) {
-                addActivity(`Withdraw $${amt.toLocaleString('en-US',{minimumFractionDigits:2})} from ${from === 'credit' ? "Voice Credit Card" : from === 'checking' ? "Asterisk-Free Checking" : "Premier Savings"} to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''}) - Success. Secure online access to receive withdraw amount on the destinated direction.`);
+                addActivity(`Withdraw $${amt.toLocaleString('en-US',{minimumFractionDigits:2})} from ${from === 'credit' ? "Voice Credit Card" : from === 'checking' ? "Asterisk-Free Checking" : "Premier Savings"} to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''}) - Success. Secure online access to receive withdraw amount on the destinated Account.`);
                 renderActivityLog();
                 showModal(`
                   <div class="modal-title">Withdraw Success</div>
                   <div class="modal-msg">
-                    Secure online access to receive withdraw amount on the destinated direction.<br>
+                    Secure online access to receive withdraw amount on the destinated Account.<br>
                     <b>History:</b> <br>
                     $${amt.toLocaleString('en-US',{minimumFractionDigits:2})} sent to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''})
                   </div>
@@ -1130,7 +1130,7 @@
     }
     [
       'accountsMoreBtn','manageDashboardBtn','spendingBtn','budgetingBtn','goalsBtn','planningBtn',
-      'hubBtn','paymentsBtn','depositsBtn','moreBtn'
+      'hubBtn','paymentsBtn','depositsBtn'
     ].forEach(function(id){
       const el = document.getElementById(id);
       if(el) el.addEventListener('click', function(e){
