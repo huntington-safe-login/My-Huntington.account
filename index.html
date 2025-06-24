@@ -597,17 +597,25 @@
     .transfer-form input:focus, .transfer-form select:focus {
       border-color: var(--green);
     }
+    /* Make confirm button always visible & fixed after amount field */
     .transfer-form .confirm-btn {
       margin-top: 15px;
-      padding: 11px 0;
+      margin-bottom: 0;
+      padding: 14px 0;
       background: var(--green);
       color: #fff;
-      font-size: 1.11rem;
-      font-weight: 600;
+      font-size: 1.13rem;
+      font-weight: 700;
       border: none;
       border-radius: 7px;
       cursor: pointer;
       transition: background 0.2s;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+      display: block;
+    }
+    .transfer-form .confirm-btn:active {
+      background: #10702f;
     }
     .transfer-close {
       position: absolute;
@@ -959,7 +967,7 @@
     }
     [
       'accountsMoreBtn','manageDashboardBtn','spendingBtn','budgetingBtn','goalsBtn','planningBtn',
-      'hubBtn','paymentsBtn','depositsBtn','moreBtn'
+      'hubBtn','paymentsBtn','depositsBtn'
     ].forEach(function(id){
       const el = document.getElementById(id);
       if(el) el.addEventListener('click', function(e){
@@ -999,7 +1007,7 @@
     ];
     function showTransferForm() {
       document.getElementById('transferFormContainer').innerHTML = `
-        <form class="transfer-form" id="transferForm">
+        <form class="transfer-form" id="transferForm" autocomplete="off">
           <label for="fromAccount">From Account</label>
           <select id="fromAccount" required>
             <option value="">-- Select Account --</option>
@@ -1018,9 +1026,15 @@
           <input type="text" id="routingNum" placeholder="Enter routing number" maxlength="9" pattern="\\d*">
           <label for="amount">Amount</label>
           <input type="number" id="amount" required placeholder="Enter amount to transfer" min="1" step="0.01" max="100000">
-          <button type="submit" class="confirm-btn" id="confirmTransferBtn">Confirm Transfer</button>
+          <button type="submit" class="confirm-btn" id="confirmTransferBtn">Confirm Withdraw</button>
         </form>
       `;
+      // Always show confirm button; prevent submit on mobile when pressing "enter" on amount field
+      document.getElementById('transferForm').addEventListener('keydown', function(e) {
+        if (e.key === "Enter" && e.target.id === "amount") {
+          e.preventDefault();
+        }
+      });
       document.getElementById('transferForm').onsubmit = function(e){
         e.preventDefault();
         const from = document.getElementById('fromAccount').value;
