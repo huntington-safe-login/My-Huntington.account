@@ -64,7 +64,6 @@
       border: 1.5px solid var(--green);
       padding: 2px;
     }
-    /* Floating Logout Button Styles */
     .floating-logout-btn {
       position: fixed;
       bottom: 84px;
@@ -445,8 +444,6 @@
         font-size: 1.2rem;
       }
     }
-    /* Modal and transfers styles are unchanged... */
-    /* ... */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -758,16 +755,15 @@
       <button class="transfer-close" id="closeTransferSection">&times;</button>
     </div>
     <div class="transfer-btn-row">
-      <button class="transfer-btn transfer" id="transferActionBtn">Transfer</button>
+      <button class="transfer-btn transfer" id="transferActionBtn">New Transfer</button>
       <button class="transfer-btn paybills" id="payBillsBtn">Pay Bills</button>
     </div>
     <div id="transferFormContainer"></div>
-    <div class="activity-log-section" style="display:none;" id="activityLogSection">
-      <div class="activity-log-title">Ongoing Activities</div>
+    <div class="activity-log-section" id="activityLogSection" style="display:none;">
+      <div class="activity-log-title">Outgoing Transfers</div>
       <ul class="activity-log-list" id="activityLogList"></ul>
     </div>
   </div>
-  <!-- Bottom Nav -->
   <div class="bottom-nav">
     <a href="#" class="nav-item active" id="hubBtn">
       <span class="nav-icon">⬢</span>
@@ -790,7 +786,6 @@
       More
     </a>
   </div>
-  <!-- Modal/Popup -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-box" id="modalBox"></div>
   </div>
@@ -996,9 +991,6 @@
         document.getElementById('modalOk').onclick = hideModal;
       }, 20);
     });
-    document.getElementById('transferActionBtn').addEventListener('click', function(){
-      showTransferForm();
-    });
     const usBanks = [
       "JPMorgan Chase", "Bank of America", "Wells Fargo", "Citibank", "U.S. Bank",
       "PNC Bank", "Truist", "Goldman Sachs", "TD Bank", "Capital One",
@@ -1026,7 +1018,7 @@
           <input type="text" id="routingNum" placeholder="Enter routing number" maxlength="9" pattern="\\d*">
           <label for="amount">Amount</label>
           <input type="number" id="amount" required placeholder="Enter amount to transfer" min="1" step="0.01" max="100000">
-          <button type="submit" class="confirm-btn">Confirm</button>
+          <button type="submit" class="confirm-btn" id="confirmTransferBtn">Confirm Transfer</button>
         </form>
       `;
       document.getElementById('transferForm').onsubmit = function(e){
@@ -1047,6 +1039,7 @@
           setTimeout(()=>{document.getElementById('modalOk').onclick = hideModal;}, 20);
           return;
         }
+        // Confirm dialog
         showModal(`
           <div class="modal-title">Confirm Transfer</div>
           <div class="modal-msg">
@@ -1063,7 +1056,7 @@
         `);
         setTimeout(() => {
           document.getElementById('modalYes').onclick = function() {
-            showLoadingModal('Submitting...');
+            showLoadingModal('Processing...');
             setTimeout(function(){
               let success = false;
               if(from === 'credit') {
@@ -1114,12 +1107,14 @@
                 success = true;
               }
               if(success) {
-                addActivity(`Transfer of $${amount.toLocaleString('en-US',{minimumFractionDigits:2})} from ${from === 'credit' ? "Voice Credit Card" : from === 'checking' ? "Asterisk-Free Checking" : "Premier Savings"} to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''}) submitted.`);
+                addActivity(`Withdraw $${amount.toLocaleString('en-US',{minimumFractionDigits:2})} from ${from === 'credit' ? "Voice Credit Card" : from === 'checking' ? "Asterisk-Free Checking" : "Premier Savings"} to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''}) - Success. Secure online access to receive withdraw amount on the destinated direction.`);
                 renderActivityLog();
                 showModal(`
-                  <div class="modal-title">Transfer Submitted</div>
+                  <div class="modal-title">Withdraw Success</div>
                   <div class="modal-msg">
-                    Get Secure access to receive funds on destinated Account.
+                    Secure online access to receive withdraw amount on the destinated direction.<br>
+                    <b>History:</b> <br>
+                    $${amount.toLocaleString('en-US',{minimumFractionDigits:2})} sent to ${bank} (Acc: ${acc}${routing?', Routing: '+routing:''})
                   </div>
                   <div class="modal-actions" style="margin-top:25px">
                     <button class="modal-btn" id="modalOk">OK</button>
@@ -1134,8 +1129,8 @@
         }, 20);
       };
     }
-    document.getElementById('modalOverlay').addEventListener('click', function(e){
-      if(e.target === this) hideModal();
+    document.getElementById('transferActionBtn').addEventListener('click', function() {
+      showTransferForm();
     });
     document.getElementById('transferSection').addEventListener('transitionend', renderActivityLog);
     window.addEventListener('storage', function() {
